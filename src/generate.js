@@ -1,7 +1,8 @@
 const path = require('path');
 const fs = require('fs-extra');
 const fg = require('fast-glob');
-const parseColorManifest = require('./parse-color-manifest');
+// const parseColorManifest = require('./parse-color-manifest');
+const getColorsWithPlatformOverrides = require('./include-platform-overrides');
 const { formatName } = require('./utils');
 
 const generators = {
@@ -12,7 +13,7 @@ const generators = {
 };
 
 async function generate(config) {
-  const colors = parseColorManifest(config.colors);
+  const colors = getColorsWithPlatformOverrides(config) // now colors is a map { platform: colors[] }
   const { outputDirectory } = config.ios;
   const prefix = formatName('ios', config);
 
@@ -35,7 +36,8 @@ async function generate(config) {
       const { outputDirectory } = config[platform];
 
       const generator = generators[platform];
-      const files = generator(colors, config).map(([filename, contents]) => [
+      // need to use platform specific list for generator !
+      const files = generator(colors[platform], config).map(([filename, contents]) => [
         path.resolve(outputDirectory, filename),
         contents,
       ]);
@@ -47,7 +49,7 @@ async function generate(config) {
     output.map(([filename, contents]) => fs.outputFile(filename, contents))
   );
 
-  return colors;
+  return colors['default']; // return default parsed colors list so that methods dependent on output of generate don't break
 }
 
 module.exports = generate;
