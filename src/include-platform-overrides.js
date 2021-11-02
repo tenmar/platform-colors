@@ -23,7 +23,7 @@ const getColorsWithPlatformOverrides = (config) => {
     // always append base, this is our default 
     const defaultColors = parseColorManifest(config.colors)
     // define out platform -> parsed colors list map
-    let platformColorMap = { 'default' : baseColors } // default always points to the way colors are originally generated
+    let platformColorMap = { 'default' : defaultColors } // default always points to the way colors are originally generated
     
     // only use platforms defined in config 
     platforms.filter(platform => config[platform])
